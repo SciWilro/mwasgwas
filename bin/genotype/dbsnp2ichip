@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+# usage:
+# dbsnp2ichip dbsnpfile mapping
+#
+# converts each dbsnp (one per line)
+# using mapping file
+# mapping file should have the iChip ID in column 1
+# and the dbsnp id in column 2
+import sys
+
+if __name__ == '__main__':
+    dfile = sys.argv[1]
+    ifile = sys.argv[2]
+
+    # load mapping
+    mapping = {}
+    for line in open(ifile,'U'):
+        if len(line.strip()) == 0:
+            continue
+        words = [word.strip() for word in line.strip().split('\t')]
+        if len(words) < 2:
+            continue
+        if(len(words[1]) > 0):
+            mapping[words[1]] = words[0]
+    
+    # print conversion
+    for line in open(dfile,'U'):
+        if mapping.has_key(line.strip()):
+            print mapping[line.strip()]
+        else:
+            print "Fail:", line.strip()
