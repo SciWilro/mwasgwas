@@ -1,4 +1,5 @@
 basedir <- Sys.getenv('MWAS_GWAS_DIR')
+cat(basedir,'\n')
 source(sprintf('%s/lib/rpackage/load2.R',basedir))
 library('optparse',quietly=TRUE)
 
@@ -28,48 +29,72 @@ option_list <- list(
               help="Estimate per-sample trended dispersion (slow) [default %default]"),
   make_option(c("-n", "--norm_factor_method"), type="character",default='none',
               help="edgeR calcNormFactors method (none, RLE, or upperquartile) [default %default]"),
+  make_option(c('-p','--make_parallel_commands'), action='store_true',
+              help="Make parallel commands for testing one SNP at a time [default %default]"),
+  make_option(c('--use_bsub'), action='store_true',
+              help="Use bsub when making parallel commands [default %default]"),
   make_option(c("-o", "--outpath"), type="character", default=NULL,
               help="path for saving output [default %default]",
               metavar="path")  
 )
 
 args <- parse_args(OptionParser(option_list = option_list))
-if(is.null(args$x_feature)) stop('x_feature required')
+if(is.null(args$x_feature) & !args$make_parallel_commands){
+  stop('x_feature or make_parallel_commands required')
+} 
 
-mb <- load.microbiome.data(args$microbiome_table,type=args$microbiome_type,collapse.at=.95)
-gx <- load.genotype.data(args$x_table, min.maf=0.1, annotations.fp=args$x_annotations)
-md <- load.metadata(args$metadata)
+if(args$make_parallel_commands){
+  gx <- load.genotype.data(args$x_table, min.maf=0.1, annotations.fp=args$x_annotations)
+  print(args)
+  for(snp in colnames(gx$x)){
+    bsub <- sprintf('bsub -o maketable-%s.lsf -q hour -R "rusage[mem=32]" "',snp)
+    basecmd <- sprintf('Rscript $MWAS_GWAS_DIR/bin/run.dge.test.r -i %s -t %s -m %s -x %s -a %s -n %s ',
+                       args$microbiome_table, args$microbiome_type, args$metadata,
+                       args$x_table, args$x_annotations, args$norm_factor_method)
+    if(!is.null(args$trended_disp)){
+      basecmd <- paste(basecmd,' -T', sep='')
+    }
+    basecmd <- paste(basecmd,' -X ',snp, sep='')
+    basecmd <- paste(basecmd,' -o ',args$outpath,'-',snp,sep='')
+    cmd <- paste(bsub, basecmd, '"', sep='')
+     cat(cmd,'\n',sep='')
+  }
+} else {
+  
+  mb <- load.microbiome.data(args$microbiome_table,type=args$microbiome_type,collapse.at=.95)
+  gx <- load.genotype.data(args$x_table, min.maf=0.1, annotations.fp=args$x_annotations)
+  md <- load.metadata(args$metadata)
+  
+  # create mxwas obj
+  mxd <- get.MX.dataset(mb=mb, gx=gx, md=md)
+  
+  # clean up covariates
+  # This is a hack
+  # need to generalize
+  covariate.names=c('Antibiotics','Immuno','Inflamed','Age','Gender',
+                    'Biopsy_Location_General','Disease','Disease_Location',
+                    'Years_since_diagnosis','Collection_Center')
+  mm <- covariate.model.matrix(mxd$md$x[,covariate.names])
+  mm <- mm[,!grepl('Disease_LocationLx',colnames(mm))]
+  mm <- mm[,!grepl('Disease_LocationL3',colnames(mm))]
 
-# create mxwas obj
-mxd <- get.MX.dataset(mb=mb, gx=gx, md=md)
-
-# clean up covariates
-# This is a hack
-# need to generalize
-covariate.names=c('Antibiotics','Immuno','Inflamed','Age','Gender',
-                  'Biopsy_Location_General','Disease','Disease_Location',
-                  'Years_since_diagnosis','Collection_Center')
-mm <- covariate.model.matrix(mxd$md$x[,covariate.names])
-mm <- mm[,!grepl('Disease_LocationLx',colnames(mm))]
-mm <- mm[,!grepl('Disease_LocationL3',colnames(mm))]
-
-
-# run tests 
-cat('Running tests for SNP > 0...\n')
-res0 <- exact.test.edgeR.covariates(x=mxd$mb$x, y=mxd$gx$x[,args$x_feature]  > 0, covariates=mm, verbose=TRUE)
-cat('Running tests for SNP == 2...\n')
-res2 <- exact.test.edgeR.covariates(x=mxd$mb$x, y=mxd$gx$x[,args$x_feature] == 2, covariates=mm, verbose=TRUE)
-
-# extract and collate results
-tt1 <- topTags(res0,n=NULL)$table
-tt2 <- topTags(res2,n=NULL)$table
-tt1 <- cbind(rownames(tt1),tt1); colnames(tt1)[1] <- 'mbID'
-tt2 <- cbind(rownames(tt2),tt2); colnames(tt2)[1] <- 'mbID'
-tt1 <- cbind(rep(args$x_feature,nrow(tt1)),tt1); colnames(tt1)[1] <- 'xID'
-tt2 <- cbind(rep(args$x_feature,nrow(tt2)),tt2); colnames(tt2)[1] <- 'xID'
-rownames(tt1) <- NULL
-rownames(tt2) <- NULL
-res <- rbind(tt1,tt2)
-
-# save results
-write.table(res,file=args$outpath,col.names=FALSE,row.names=FALSE,sep='\t',quote=FALSE)
+  # run tests 
+  cat('Running tests for SNP > 0...\n')
+  res0 <- exact.test.edgeR.covariates(x=mxd$mb$x, y=mxd$gx$x[,args$x_feature]  > 0, covariates=mm, verbose=TRUE)
+  cat('Running tests for SNP == 2...\n')
+  res2 <- exact.test.edgeR.covariates(x=mxd$mb$x, y=mxd$gx$x[,args$x_feature] == 2, covariates=mm, verbose=TRUE)
+  
+  # extract and collate results
+  tt1 <- topTags(res0,n=NULL)$table
+  tt2 <- topTags(res2,n=NULL)$table
+  tt1 <- cbind(rownames(tt1),tt1); colnames(tt1)[1] <- 'mbID'
+  tt2 <- cbind(rownames(tt2),tt2); colnames(tt2)[1] <- 'mbID'
+  tt1 <- cbind(rep(args$x_feature,nrow(tt1)),tt1); colnames(tt1)[1] <- 'xID'
+  tt2 <- cbind(rep(args$x_feature,nrow(tt2)),tt2); colnames(tt2)[1] <- 'xID'
+  rownames(tt1) <- NULL
+  rownames(tt2) <- NULL
+  res <- rbind(tt1,tt2)
+  
+  # save results
+  write.table(res,file=args$outpath,col.names=FALSE,row.names=FALSE,sep='\t',quote=FALSE)
+}
