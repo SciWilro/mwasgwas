@@ -1,5 +1,4 @@
 basedir <- Sys.getenv('MWAS_GWAS_DIR')
-cat(basedir,'\n')
 source(sprintf('%s/lib/rpackage/load2.R',basedir))
 library('optparse',quietly=TRUE)
 
@@ -49,14 +48,17 @@ if(args$make_parallel_commands){
     bsub <- sprintf('bsub -o maketable-%s.lsf -q hour -R "rusage[mem=32]" "',snp)
     basecmd <- sprintf('Rscript $MWAS_GWAS_DIR/bin/run.dge.test.r -i %s -t %s -m %s -x %s -a %s -n %s ',
                        args$microbiome_table, args$microbiome_type, args$metadata,
-                       args$x_table, args$x_annotations, args$norm_factor_method)
+                       args$x_table, args$norm_factor_method)
     if(!is.null(args$trended_disp)){
       basecmd <- paste(basecmd,' -T', sep='')
+    }
+    if(!is.null(args$x_annotations)){
+      basecmd <- paste(basecmd,' -a ',args$x_annotations, sep='')
     }
     basecmd <- paste(basecmd,' -X ',snp, sep='')
     basecmd <- paste(basecmd,' -o ',args$outpath,'-',snp,sep='')
     cmd <- paste(bsub, basecmd, '"', sep='')
-     cat(cmd,'\n',sep='')
+    cat(cmd,'\n',sep='')
   }
 } else {
   
@@ -76,7 +78,7 @@ if(args$make_parallel_commands){
   mm <- covariate.model.matrix(mxd$md$x[,covariate.names])
   mm <- mm[,!grepl('Disease_LocationLx',colnames(mm))]
   mm <- mm[,!grepl('Disease_LocationL3',colnames(mm))]
-
+  
   # run tests 
   cat('Running tests for SNP > 0...\n')
   res0 <- exact.test.edgeR.covariates(x=mxd$mb$x, y=mxd$gx$x[,args$x_feature]  > 0, covariates=mm, verbose=TRUE)
