@@ -303,5 +303,4 @@ resetPar <- function() {
 }
 
 # spiral-based colors lifted from bong wang's http://www.nature.com/nmeth/journal/v7/n8/pdf/nmeth0810-573.pdf
-require('grDevices',quiet=TRUE)
 bong.cols <- rgb(c(207,129,100,125,126,56),c(184,173,157,102,39,0),c(219,211,44,28,18,36),maxColorValue=255)
