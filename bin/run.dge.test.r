@@ -24,13 +24,13 @@ option_list <- list(
   make_option(c("-X", "--x_feature"), type="character", default=NULL,
               help="Test only this feature from x table [default %default]",
               metavar="feature"),
-  make_option(c("-T", "--trended_disp"), action="store_true",
+  make_option(c("-T", "--trended_disp"), action="store_true", default=FALSE,
               help="Estimate per-sample trended dispersion (slow) [default %default]"),
   make_option(c("-n", "--norm_factor_method"), type="character",default='none',
               help="edgeR calcNormFactors method (none, RLE, or upperquartile) [default %default]"),
-  make_option(c('-p','--make_parallel_commands'), action='store_true',
+  make_option(c('-p','--make_parallel_commands'), action='store_true', default=FALSE,
               help="Make parallel commands for testing one SNP at a time [default %default]"),
-  make_option(c('--use_bsub'), action='store_true',
+  make_option(c('--use_bsub'), action='store_true', default=FALSE,
               help="Use bsub when making parallel commands [default %default]"),
   make_option(c("-o", "--outpath"), type="character", default=NULL,
               help="path for saving output [default %default]",
@@ -38,7 +38,7 @@ option_list <- list(
 )
 
 args <- parse_args(OptionParser(option_list = option_list))
-if(is.null(args$x_feature) & is.null(args$make_parallel_commands)){
+if(is.null(args$x_feature) & !args$make_parallel_commands){
   stop('x_feature or make_parallel_commands required')
 } 
 
@@ -49,10 +49,10 @@ if(args$make_parallel_commands){
     basecmd <- sprintf('Rscript $MWAS_GWAS_DIR/bin/run.dge.test.r -i %s -t %s -m %s -x %s -n %s ',
                        args$microbiome_table, args$microbiome_type, args$metadata,
                        args$x_table, args$norm_factor_method)
-    if(!is.null(args$trended_disp)){
+    if(args$trended_disp){
       basecmd <- paste(basecmd,' -T', sep='')
     }
-    if(!is.null(args$x_annotations)){
+    if(args$x_annotations){
       basecmd <- paste(basecmd,' -a ',args$x_annotations, sep='')
     }
     basecmd <- paste(basecmd,' -X ',snp, sep='')
