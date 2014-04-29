@@ -1,7 +1,7 @@
 # impute missing data
 # Rscript impute.missing.metadata.r mappingfile taxonfile outfile
 basedir <- Sys.getenv('MWAS_GWAS_DIR')
-source(sprintf('%s/src/lib/rpackage/util.load.r',basedir))
+source(sprintf('%s/lib/rpackage/util.load.r',basedir))
 
 covariate.names <- c('Antibiotics','Immuno','Inflamed','Age','Gender',
                      'Biopsy_Location_General','Disease','Disease_Location',

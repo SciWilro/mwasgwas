@@ -1,5 +1,5 @@
 basedir <- Sys.getenv('MWAS_GWAS_DIR')
-source(sprintf('%s/src/lib/rpackage/load2.R',basedir))
+source(sprintf('%s/lib/rpackage/load2.R',basedir))
 library('optparse',quietly=TRUE)
 
 # set up and parse command-line options

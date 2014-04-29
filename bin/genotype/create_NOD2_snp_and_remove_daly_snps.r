@@ -1,5 +1,5 @@
 basedir <- Sys.getenv('MWAS_GWAS_DIR')
-source(sprintf('%s/src/lib/rpackage/load2.R',basedir))
+source(sprintf('%s/lib/rpackage/load2.R',basedir))
 IN.TABLE <- '~/drive/research/prism/data/genetic/merged-prism-msh-nl.raw'
 OUT.TABLE <- '~/drive/research/prism/data/genetic/merged-prism-msh-nl-with-NOD2.raw'
 IN.ANNOT <- '~/drive/research/prism/data/genetic/2013-01-09-generate-snps/all-snps-metadata-with-pos-with-categories.txt'

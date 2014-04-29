@@ -1,6 +1,6 @@
-source(sprintf('%s/src/lib/rpackage/util.load.r',Sys.getenv('MWAS_GWAS_DIR')))
-source(sprintf('%s/src/lib/rpackage/general-utilities.r',Sys.getenv('MWAS_GWAS_DIR')))
-source(sprintf('%s/src/lib/rpackage/util.r',Sys.getenv('MWAS_GWAS_DIR')))
+source(sprintf('%s/lib/rpackage/util.load.r',Sys.getenv('MWAS_GWAS_DIR')))
+source(sprintf('%s/lib/rpackage/general-utilities.r',Sys.getenv('MWAS_GWAS_DIR')))
+source(sprintf('%s/lib/rpackage/util.r',Sys.getenv('MWAS_GWAS_DIR')))
 library('optparse',quietly=TRUE)
 
 # set up and parse command-line options
