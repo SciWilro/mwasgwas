@@ -72,4 +72,4 @@ rownames(tt2) <- NULL
 res <- rbind(tt1,tt2)
 
 # save results
-write.table(res,file=args$outpath,col.names=FALSE,sep='\t',quote=FALSE)
+write.table(res,file=args$outpath,col.names=FALSE,row.names=FALSE,sep='\t',quote=FALSE)
