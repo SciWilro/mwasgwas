@@ -39,13 +39,12 @@ option_list <- list(
 )
 
 args <- parse_args(OptionParser(option_list = option_list))
-if(is.null(args$x_feature) & !args$make_parallel_commands){
+if(is.null(args$x_feature) & is.null(args$make_parallel_commands)){
   stop('x_feature or make_parallel_commands required')
 } 
 
 if(args$make_parallel_commands){
-  gx <- load.genotype.data(args$x_table, min.maf=0.1, annotations.fp=args$x_annotations)
-  print(args)
+  gx <- load.genotype.data(args$x_table, annotations.fp=args$x_annotations)
   for(snp in colnames(gx$x)){
     bsub <- sprintf('bsub -o maketable-%s.lsf -q hour -R "rusage[mem=32]" "',snp)
     basecmd <- sprintf('Rscript $MWAS_GWAS_DIR/bin/run.dge.test.r -i %s -t %s -m %s -x %s -a %s -n %s ',
