@@ -1,5 +1,5 @@
 mbdir <- Sys.getenv('MWAS_DIR')
-source(sprintf('%s/src/lib/wrap.edgeR.r',mbdir))
+source(sprintf('%s/lib/wrap.edgeR.r',mbdir))
 
 # tests every microbiome feature (taxon/otu/function) 
 # against a single binary or numeric outcome
