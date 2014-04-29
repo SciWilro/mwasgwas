@@ -90,8 +90,8 @@ if(args$make_parallel_commands){
   tt2 <- topTags(res2,n=NULL)$table
   tt1 <- cbind(rownames(tt1),tt1); colnames(tt1)[1] <- 'mbID'
   tt2 <- cbind(rownames(tt2),tt2); colnames(tt2)[1] <- 'mbID'
-  tt1 <- cbind(rep(args$x_feature,nrow(tt1)),tt1); colnames(tt1)[1] <- 'xID'
-  tt2 <- cbind(rep(args$x_feature,nrow(tt2)),tt2); colnames(tt2)[1] <- 'xID'
+  tt1 <- cbind(rep(sprintf('%s_0',args$x_feature),nrow(tt1)),tt1); colnames(tt1)[1] <- 'xID'
+  tt2 <- cbind(rep(sprintf('%s_2',args$x_feature),nrow(tt2)),tt2); colnames(tt2)[1] <- 'xID'
   rownames(tt1) <- NULL
   rownames(tt2) <- NULL
   res <- rbind(tt1,tt2)
