@@ -81,9 +81,13 @@ if(args$make_parallel_commands){
   
   # run tests 
   cat('Running tests for SNP > 0...\n')
-  res0 <- exact.test.edgeR.covariates(x=mxd$mb$x, y=mxd$gx$x[,args$x_feature]  > 0, covariates=mm, verbose=TRUE)
+  res0 <- exact.test.edgeR.covariates(x=mxd$mb$x, y=mxd$gx$x[,args$x_feature]  > 0,
+                                      covariates=mm, norm.factor.method=args$norm_factor_method,
+                                      estimate.trended.disp=args$trended_disp, verbose=TRUE)
   cat('Running tests for SNP == 2...\n')
-  res2 <- exact.test.edgeR.covariates(x=mxd$mb$x, y=mxd$gx$x[,args$x_feature] == 2, covariates=mm, verbose=TRUE)
+  res2 <- exact.test.edgeR.covariates(x=mxd$mb$x, y=mxd$gx$x[,args$x_feature] == 2,
+                                      covariates=mm, norm.factor.method=args$norm_factor_method,
+                                      estimate.trended.disp=args$trended_disp, verbose=TRUE)
   
   # extract and collate results
   tt1 <- topTags(res0,n=NULL)$table

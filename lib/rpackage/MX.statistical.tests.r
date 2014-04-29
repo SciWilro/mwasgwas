@@ -126,3 +126,12 @@ source(sprintf('%s/lib/wrap.edgeR.r',mbdir))
   # check x, covariates
   
 }
+
+"load.dge.results" <- function(fp){
+  res <- read.table(fp,sep='\t',head=F,row=NULL)
+  dim(res)
+  colnames(res) <- c('gwasID','mwasID','logFC','logCPM','LR','pvalue','qvalue')
+  res$qvalue <- p.adjust(res$pvalue)
+  res <- res[order(res$pvalue),]
+  return(res)
+}
