@@ -46,7 +46,7 @@ if(args$make_parallel_commands){
   gx <- load.genotype.data(args$x_table, annotations.fp=args$x_annotations)
   for(snp in colnames(gx$x)){
     bsub <- sprintf('bsub -o maketable-%s.lsf -q hour -R "rusage[mem=32]" "',snp)
-    basecmd <- sprintf('Rscript $MWAS_GWAS_DIR/bin/run.dge.test.r -i %s -t %s -m %s -x %s -a %s -n %s ',
+    basecmd <- sprintf('Rscript $MWAS_GWAS_DIR/bin/run.dge.test.r -i %s -t %s -m %s -x %s -n %s ',
                        args$microbiome_table, args$microbiome_type, args$metadata,
                        args$x_table, args$norm_factor_method)
     if(!is.null(args$trended_disp)){
