@@ -3,8 +3,8 @@
 argv <- commandArgs(TRUE)
 snp.table.fp <- argv[1]
 plink.map.fp <- argv[2]
-m <- read.table(plink.map.fp,sep='\t',head=F)
-snps <- read.table(snp.table.fp,sep='\t',head=T,row=1,check=F)
+m <- read.table(plink.map.fp,sep='\t',head=F, stringsAsFactors=F)
+snps <- read.table(snp.table.fp,sep='\t',head=T,row=1,check=F, stringsAsFactors=F)
 
 # first match by rsID
 matches <- NULL
@@ -29,4 +29,6 @@ rsIDs <- rownames(snps)[match(match.by.pos, snpnames)]
 icIDs <- m[match(match.by.pos, mapnames),2]
 matches <- rbind(matches, cbind(rsIDs, icIDs))
 
+# remove duplicates
+matches <- matches[match(sort(unique(matches[,2])),matches[,2]),,drop=F]
 write.table(matches[,2:1],sep='\t',quote=F,col=F,row=F)

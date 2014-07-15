@@ -3,6 +3,7 @@
 		inflamed.separate=TRUE,
         bodysite.order=c('Ileum','Colon','Rectum','Pre_Pouch_Ileum','Pouch'),
         infstates=c('No','Yes')){
+    map <- as.data.frame(map)
      mb.ix <- map[,'Have_Microbiome'] == 'Yes'
      gx.ix <- map[,'Have_Genomics'] == 'Yes'
 	keep <- rep(FALSE,nrow(map))

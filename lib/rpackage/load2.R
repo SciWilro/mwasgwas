@@ -7,6 +7,7 @@ source(sprintf('%s/lib/rpackage/MX.dataset.functions.r',srcdir))
 source(sprintf('%s/lib/rpackage/MX.statistical.tests.r',srcdir))
 #source('~/drive/enterotypes/scripts/package/clustering.r',srcdir))
 library('vegan')
+library('RColorBrewer')
 
 "get.MX.dataset" <- function(
   mb, # microbiome table (taxa, otus, functions, bdiv pc's, alpha diversities)

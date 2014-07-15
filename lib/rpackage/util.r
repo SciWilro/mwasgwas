@@ -565,9 +565,30 @@
 
 # convenience wrapper for p.distribution.test that takes association tables
 # instead of p-value matrices
+# ensure
 "p.distribution.test.from.association.tables" <- function(obs,null=NULL, snp.names=NULL, pvalue.column='pvalue',
-        rs2gene=NULL, ...){
+        rs2gene=NULL, ensure.feature.overlap=TRUE, feature.column='Taxon',...){
     if(!is.null(snp.names)) obs[,1] <- snp.names
+    
+    
+    # identify those features that are present in all sets of p-values
+    # this is for the dase where certain observations have p-values for only a subset of the 
+    # features (e.g. some SNPs only tested against 150 of the 156 taxa)
+    if(ensure.feature.overlap){
+		# in case observation column is a factor
+		obs[,1] <- as.character(obs[,1])
+		if(!is.null(null)) null[,1] <- as.character(null[,1])
+
+		feature.list <- as.character(obs[,feature.column])
+		if(!is.null(null)) feature.list <- c(feature.list, as.character(null[,feature.column]))
+		feature.table <- table(feature.list)
+		keep.features <- names(feature.table)[feature.table == max(feature.table)]
+		obs <- obs[obs[,feature.column] %in% keep.features,]
+		if(!is.null(null)) null <- null[null[,feature.column] %in% keep.features,]
+		
+
+	}
+		
     p.sets <- t(sapply(split(obs[,pvalue.column], obs[,1]),function(xx) xx))
     if(!is.null(rs2gene)) rownames(p.sets) <- rs2gene[rownames(p.sets)]
     null.sets <- NULL
@@ -635,6 +656,7 @@
     x.pvals <- sort((1:n)/(1+n))
     p.sets.pvals <- p.sets
     null.sets.pvals <- null.sets
+
     for(i in 1:nrow(p.sets)) p.sets[i,] <- sort(-log10(p.sets[i,]))
     for(i in 1:nrow(null.sets)) null.sets[i,] <- sort(-log10(null.sets[i,]))
     qlow <- apply(null.sets,2,quantile,alpha)

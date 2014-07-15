@@ -93,7 +93,7 @@
   } else {
     stop('Unknown data type specified.')
   }
-  
+
   # filter by MAF
   res$x <- res$x[, get.maf(res$x) > min.maf]
   
@@ -391,4 +391,41 @@
     pathways.snp <- pathways.snp[rowSums(pathways.snp) > 0,]
     pathways.gene <- pathways.gene[rowSums(pathways.gene) > 0,]
     return(list(pathways.snp=pathways.snp,pathways.gene=pathways.gene,pathway.sizes=pathway.sizes))
+}
+
+
+# pick a single sample per subject. Note this function is very specific to 
+# the particular data set for which it was developed.
+# It assumes that some subjects have multiple samples from different biopsy sites
+# and some inflamed/non-inflamed.
+"pick.unique.samples" <- function(map,subject.column='Gx_Subject_ID',
+		sample.site.column='Biopsy_Location_General',
+		sample.site.order=c('Ileum','Colon','Rectum','Pouch','Pre_Pouch_Ileum'),
+		inflamed.column='Inflamed',
+		inflamed.order=c('Yes','No'),
+		return.logical=TRUE){
+	keep.ix <- NULL
+	subj.ids <- split(rownames(m),m[,subject.column])
+	for(i in seq_along(subj.ids)){
+		subj.ix <- match(subj.ids[[i]],rownames(m))
+		if(length(subj.ix) == 1) {
+			keep.ix <- c(keep.ix,subj.ix)
+		} else {
+			infl <- m[subj.ix,inflamed.column]
+			loc <- m[subj.ix,sample.site.column]
+			keep.ix.i <- NULL
+			for(loc.type in sample.site.order){
+				for(infl.type in inflamed.order){
+					ix.i <- infl == infl.type & loc == loc.type
+					if(any(ix.i)) keep.ix.i <- c(keep.ix.i, subj.ix[ix.i][1])
+				}
+			}
+			keep.ix.i <- c(keep.ix.i,subj.ix)
+			keep.ix <- c(keep.ix,keep.ix.i[1])
+		}
+	}
+	keep.ix.logical <- rep(FALSE,nrow(map))
+	keep.ix.logical[keep.ix] <- TRUE
+	if(return.logical) return(keep.ix.logical)
+	return(keep.ix)
 }

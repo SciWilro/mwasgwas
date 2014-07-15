@@ -14,12 +14,15 @@ PREFIX=$2
 # extract all identical matches from plink map first by rsID, then by coords
 # output is two columns
 # ichipID rsID
-Rscript ../../../code/extract_best_snp_matches_from_plink_map.r ${SNPTABLE} ${PLINKBASE}.map > ic-rs-mapping-${PREFIX}.txt
+echo "Rscript ~/drive/research/prism/src/bin/genotype/extract_best_snp_matches_from_plink_map.r ${SNPTABLE} ${PLINKBASE}.map > ic-rs-mapping-${PREFIX}.txt"
+Rscript ~/drive/research/prism/src/bin/genotype/extract_best_snp_matches_from_plink_map.r ${SNPTABLE} ${PLINKBASE}.map > ic-rs-mapping-${PREFIX}.txt
 
 # use this to 
 # 1. extract subset from plink/ped file
 cut -f 1 ic-rs-mapping-${PREFIX}.txt > ic-id-subset-${PREFIX}.txt
+echo "plink --file ${PLINKBASE} --extract ic-id-subset-${PREFIX}.txt --out subset-${PREFIX} --tab --recode"
 plink --file ${PLINKBASE} --extract ic-id-subset-${PREFIX}.txt --out subset-${PREFIX} --tab --recode
+
 # dedup subjects
 sort -u -k 2,2 subset-${PREFIX}.ped > tmp; mv tmp subset-${PREFIX}.ped
 

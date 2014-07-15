@@ -88,7 +88,7 @@ if __name__ == '__main__':
         commands.append(cmd)
 
     # make study IDs as a phenotype file
-    cmd = "python ~/drive/prism/code/make-study-ID-as-pheno.py " + \
+    cmd = "python ~/drive/research/prism/src/bin/genotype/make-study-ID-as-pheno.py " + \
           options.basename1 + ".ped " + options.basename2 + ".ped > study12.pheno"
     commands.append(cmd)
 
@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
 
     # greedy chose snps to flip
-    cmd = "time Rscript ~/drive/prism/code/greedy_flip_strands_AT_CG.r " +\
+    cmd = "time Rscript ~/drive/research/prism/src/bin/genotype/greedy_flip_strands_AT_CG.r " +\
          options.out_basename + "-pre-flipscan-genop1.flipscan.txt " +\
          options.out_basename + "-pre-flipscan-genop1.flipscan.fliplist.txt"
     commands.append(cmd)
