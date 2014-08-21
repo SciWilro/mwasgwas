@@ -613,7 +613,11 @@
         plot.null=FALSE, plot.nonsig=TRUE,
         n.plot=NULL,
         hits.to.show=NULL,
-        test.type=c('average','slope','ratio','diff','geom','geom50','harm','nsignif','rankproduct','qvalue-p0','kstest-parametric','kstest')[1],
+        test.type=c('average','slope','ratio','diff',
+        			'geom','geom50','harm','nsignif',
+        			'rankproduct','qvalue-p0',
+        			'kstest-parametric','kstest',
+        			'utest')[1],
         filename=NULL,
         use.qvalue=FALSE,
         important.hits.only=FALSE
@@ -727,6 +731,19 @@
 		null.rank.prods <- sapply(split(ranks[length(memberships) + seq(length(null.memberships))], null.memberships), 
 				function(xx) sum(log(xx)))
 		pvals <- sapply(rank.prods,function(xx) mean(c(null.rank.prods,xx) <= xx))
+		names(pvals) <- rownames(p.sets)
+    } else if (test.type == 'utest'){
+		ranks <- rank(c(as.numeric(t(p.sets.pvals)), as.numeric(t(null.sets.pvals))))
+		memberships <- rep(1:nrow(p.sets.pvals),each=ncol(p.sets.pvals))
+		null.memberships <- rep(1:nrow(null.sets.pvals),each=ncol(p.sets.pvals))
+		
+		# t-test comparing obs to null ranks for each p.set
+		pvals <- numeric(nrow(p.sets))
+		for(i in 1:length(pvals)){
+			obs.ranks <- ranks[1:length(memberships)][memberships == i]
+			null.ranks <- ranks[(length(memberships)+1):length(ranks)]
+			pvals[i] <- wilcox.test(obs.ranks, null.ranks,alternative='less')$p.value
+		}
 		names(pvals) <- rownames(p.sets)
     } else {
         stop('Unknown test type\n')

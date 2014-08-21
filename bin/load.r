@@ -117,7 +117,7 @@ inflamed.order=c('Yes','No')
 sample.site.order=c('Ileum','Colon','Pre_Pouch_Ileum','Rectum','Pouch')
 # inflamed.order=c('No','Yes')
 
-clin <- clin2
+clin <- clin1
 
 subset.ix <- pick.unique.samples(m, sample.site.order=sample.site.order, inflamed.order=inflamed.order)
 
