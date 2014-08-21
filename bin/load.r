@@ -112,8 +112,8 @@ clin2 <- c('Age','Antibiotics','Biopsy_Location_General','Collection_Center','Di
 
 snps <- read.table('~/drive/research/prism/data/genetic/2013-01-09-generate-snps/all-snps-metadata-with-pos-with-categories-with-NOD2.txt',sep='\t',head=T,row=1,check=F)
 
-sample.site.order=c('Colon','Ileum','Rectum','Pouch','Pre_Pouch_Ileum')
 inflamed.order=c('Yes','No')
+sample.site.order=c('Colon','Ileum','Rectum','Pouch','Pre_Pouch_Ileum')
 sample.site.order=c('Ileum','Colon','Pre_Pouch_Ileum','Rectum','Pouch')
 # inflamed.order=c('No','Yes')
 
@@ -121,8 +121,8 @@ clin <- clin1
 
 subset.ix <- pick.unique.samples(m, sample.site.order=sample.site.order, inflamed.order=inflamed.order)
 
-# subset.ix <- subset.ix & m$Age <=75 & m$Age >= 18 & m$Disease %in% c('CD','UC')
-subset.ix <- subset.ix & m$Age <=75 & m$Age >= 1 & m$Disease %in% c('CD','UC')
+subset.ix <- subset.ix & m$Age <=75 & m$Age >= 18 & m$Disease %in% c('CD','UC')
+# subset.ix <- subset.ix & m$Age <=75 & m$Age >= 1 & m$Disease %in% c('CD','UC')
 
 subset1 <- subset.ix 
 
